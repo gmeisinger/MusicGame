@@ -24,7 +24,7 @@ public class MusicManager : MonoBehaviour
         {
             for (int j = 0; j < lastFrequency; j++)
             {
-                frequencies[i,j] = Instantiate<GameObject>(frequencyParents[i].GetComponent<FrequencyContainer>().frequencyPrefab, frequencyParents[i]).GetComponent<IFrequency>();
+                frequencies[i, j] = frequencyParents[i].GetComponent<FrequencyBarContainer>().InstantiateFrequency();
                 frequencies[i,j].Amplitude = DEFAULT_FREQ_HEIGHT;
             }
         }
@@ -39,7 +39,7 @@ public class MusicManager : MonoBehaviour
     private void Update()
     {
         //
-        float[] spectrum = new float[256];
+        float[] spectrum = new float[1024];
 
         AudioListener.GetSpectrumData(spectrum, 0, FFTWindow.Rectangular);
 

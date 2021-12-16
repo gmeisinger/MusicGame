@@ -8,6 +8,9 @@ public class MushroomBall : MonoBehaviour
     SpriteRenderer m_SpriteRenderer;
     Collider2D m_Collider;
 
+    [SerializeField]
+    float hitForce = 100f;
+
     private void Awake()
     {
         m_ParticleSystem = GetComponent<ParticleSystem>();
@@ -25,5 +28,10 @@ public class MushroomBall : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Explode();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        collision.collider.attachedRigidbody.AddForceAtPosition(((Vector2)collision.gameObject.transform.position - collision.contacts[0].point).normalized * hitForce, collision.contacts[0].point);
     }
 }

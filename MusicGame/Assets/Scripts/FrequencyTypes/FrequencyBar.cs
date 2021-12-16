@@ -2,9 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// A typical frequency bar, can grow vertically or horizontally.
+/// </summary>
 [RequireComponent(typeof(BoxCollider2D))]
 public class FrequencyBar : MonoBehaviour, IFrequency
 {
+    public bool horizontal = false;
+
     protected float speed = 300f;
 
     protected float force;
@@ -27,7 +32,7 @@ public class FrequencyBar : MonoBehaviour, IFrequency
         boxCollider = GetComponent<BoxCollider2D>();
     }
 
-    void Start()
+    void SetColliderSize()
     {
         boxCollider.offset = new Vector2(rect.sizeDelta.x / 2, rect.sizeDelta.y / 2);
         boxCollider.size = rect.sizeDelta;
@@ -35,13 +40,46 @@ public class FrequencyBar : MonoBehaviour, IFrequency
 
     virtual protected void Update()
     {
+        if(horizontal)
+        {
+            UpdateHorizontal();
+        }
+        else
+        {
+            UpdateVertical();
+        }
+    }
+
+    private void UpdateVertical()
+    {
+        if (boxCollider.offset.x != rect.sizeDelta.x)
+        {
+            SetColliderSize();
+        }
+
         float step = speed * Time.deltaTime;
 
-        boxCollider.offset = new Vector2(rect.sizeDelta.x, Mathf.MoveTowards(boxCollider.offset.y, amplitude / 2, step));
+        boxCollider.offset = new Vector2(boxCollider.offset.x, Mathf.MoveTowards(boxCollider.offset.y, amplitude / 2, step));
         boxCollider.size = new Vector2(rect.sizeDelta.x, Mathf.MoveTowards(boxCollider.size.y, amplitude, step));
         rect.sizeDelta = boxCollider.size;
-        growing = amplitude > boxCollider.size.y ? true : false;
+        growing = amplitude > boxCollider.size.y;
         force = growing ? amplitude - boxCollider.size.y : 0f;
+    }
+
+    private void UpdateHorizontal()
+    {
+        if (boxCollider.offset.y != rect.sizeDelta.y)
+        {
+            SetColliderSize();
+        }
+
+        float step = speed * Time.deltaTime;
+
+        boxCollider.offset = new Vector2(Mathf.MoveTowards(boxCollider.offset.x, amplitude / 2, step), boxCollider.offset.y);
+        boxCollider.size = new Vector2(Mathf.MoveTowards(boxCollider.size.x, amplitude, step), rect.sizeDelta.y);
+        rect.sizeDelta = boxCollider.size;
+        growing = amplitude > boxCollider.size.x ? true : false;
+        force = growing ? amplitude - boxCollider.size.x : 0f;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
